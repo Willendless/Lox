@@ -11,8 +11,9 @@ $(TARGET): $(SOURCES)
 build:
 	@mkdir -p build
 
-run: $(TARGET)
-	java -classpath build/ $(TARGET)
+# usage: make run ifile='intpufile.txt'
+run:
+	java -classpath build/ $(TARGET) $(ifile)
 
 clean:
 	rm -rf build/*
