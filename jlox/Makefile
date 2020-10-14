@@ -12,7 +12,7 @@ build:
 	@mkdir -p build
 
 # usage: make run ifile='intpufile.txt'
-run:
+run: $(TARGET)
 	java -classpath build/ $(TARGET) $(ifile)
 
 clean:
