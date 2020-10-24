@@ -25,7 +25,8 @@
 + 为每一个优先级级别定义一个独立的规则，优先级越小的规则优先出现：
 
 ```
-expression -> equality;
+expression -> comma;
+comma -> equality ("," equality)*;
 equality -> comparison ( ( "!=" | "==" ) comparison )*;
 comparison -> term ( ( ">" | ">=" | "<" "<=" ) term )*;
 term -> factor ( ( "-" | "+" ) factor )*;

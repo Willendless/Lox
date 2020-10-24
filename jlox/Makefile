@@ -19,7 +19,7 @@ run: $(TARGET)
 	java -classpath build/ $(TARGET) $(ifile)
 
 # usage: make generate_ast outputdir='./src/jlox'
-generate_ast: $(TARGET)
+generate_ast:
 	java -classpath build/ $(AST) $(outputdir)
 
 rm_generation:

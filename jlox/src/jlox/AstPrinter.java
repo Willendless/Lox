@@ -5,6 +5,8 @@ import jlox.Expr.Grouping;
 import jlox.Expr.Literal;
 import jlox.Expr.Unary;
 
+import java.util.List;
+
 public class AstPrinter implements Expr.Visitor<String> {
 
     public String print(Expr expr) {
@@ -28,7 +30,8 @@ public class AstPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitLiteralExpr(Literal expr) {
-        if (expr.value == null) return "nil";
+        if (expr.value == null)
+            return "nil";
         return expr.value.toString();
     }
 
@@ -45,17 +48,24 @@ public class AstPrinter implements Expr.Visitor<String> {
         return builder.toString();
     }
 
+    private String parenthesize(String name, List<Expr> exprs) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("(").append(name);
+        for (Expr e : exprs) {
+            builder.append(" ");
+            builder.append(e.accept(this));
+        }
+        builder.append(")");
+
+        return builder.toString();
+    }
+
     public static void main(String[] args) {
         Expr expression = new Expr.Binary(
-            new Expr.Unary(
-                new Expr.Literal(123),
-                new Token(TokenType.MINUS, "-", null, 1)),
-            new Expr.Grouping(
-                new Expr.Literal(45.67)
-            ),
-            new Token(TokenType.STAR, "*", null, 1)
-        );
+                new Expr.Unary(new Expr.Literal(123), new Token(TokenType.MINUS, "-", null, 1)),
+                new Expr.Grouping(new Expr.Literal(45.67)), new Token(TokenType.STAR, "*", null, 1));
         System.out.println(new AstPrinter().print(expression));
     }
-    
+
 }
