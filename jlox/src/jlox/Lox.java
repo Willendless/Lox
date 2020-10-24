@@ -49,11 +49,20 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
+        Parser parser = new Parser(tokens);
+        Expr expr = parser.parse();
 
-        for (Token t : tokens) {
-            System.out.println(t);
+        if (hadError) return;
+
+        System.out.println(new AstPrinter().print(expr));
+    }
+
+    static void error(Token token, String msg) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", msg);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", msg);
         }
-
     }
 
     static void error(int line, String msg) {
