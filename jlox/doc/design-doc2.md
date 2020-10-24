@@ -21,7 +21,7 @@
 
 ---
 
-+ production/rule:
++ rule -> production:
   + includes its name - *head* and *body* - a list of symbols, which describes what its generates
   + in cfg(context-free grammar): head has only a single symbol
 + symbols:
