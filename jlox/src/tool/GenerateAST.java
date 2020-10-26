@@ -37,7 +37,6 @@ public class GenerateAST {
 
         writer.println("package jlox;");
         writer.println();
-        writer.println("import java.util.List;");
         writer.println("abstract class " + baseName + " {");
         writer.println();
 

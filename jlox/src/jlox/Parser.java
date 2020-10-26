@@ -121,7 +121,7 @@ public class Parser {
     private Expr unary() {
         if (match(TokenType.BANG, TokenType.MINUS)) {
             Token operator = previous();
-            Expr right = unary();
+            Expr right = unary();   // 左结合
             return new Expr.Unary(right, operator);
         }
         return primary();

@@ -6,7 +6,7 @@ AST=tool/GenerateAST
 GEN=Expr.java
 outputdir=./src/jlox
 
-all: build generate_ast $(TARGET)
+all: build $(TARGET) generate_ast 
 
 $(TARGET): $(SOURCES)
 	javac -d build/ $^
