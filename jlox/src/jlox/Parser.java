@@ -1,5 +1,6 @@
 package jlox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -13,9 +14,13 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
+    List<Stmt> parse() {
         try {
-            return expression();
+            List<Stmt> statements = new ArrayList<>();
+            while (!isAtEnd()) {
+                statements.add(declaration());
+            }
+            return statements;
         } catch (ParseError error) {
             // 处理parseError是parser的责任，不应当
             // 泄漏到其他部件中
@@ -23,18 +28,98 @@ public class Parser {
         }
     }
 
+    // program -> declaration*
+    // declaration -> varDeclaration
+    //              | statement 
+    private Stmt declaration() {
+        try {
+            if (match(TokenType.VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+        // variable's default value is null
+        Expr initializer = null;
+        if (match(TokenType.EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declartion.");
+        return new Stmt.Declare(name, initializer);
+    }
+
+    // stmt -> exprStmt
+    //      | printStmt
+    //      | block
+    private Stmt statement() {
+        if (match(TokenType.PRINT)) return printStatement();
+        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        return expressionStatement();
+    }
+
+    // block -> "{" declaration* "}"
+    private List<Stmt> block() {
+        List<Stmt> stmts = new ArrayList<>();
+
+        while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+            stmts.add(declaration());
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expect right brace");
+        return stmts;
+    }
+
+    // printStmt -> "print" expression ";"
+    private Stmt printStatement() {
+        Expr expr = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(expr);
+    }
+
+    // exprStmt -> expression ";"
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Expression(expr);
+    }
+    
+    // expr -> comma
     private Expr expression() {
         return comma();
     }
 
-    // comma -> equality ("," equality)*
+    // comma -> assignment ("," assignment)*
     private Expr comma() {
-        Expr expr = equality();
+        Expr expr = assignment();
 
         while (match(TokenType.COMMA)) {
             Token operator = previous();
-            Expr right = equality();
+            Expr right = assignment();
             expr = new Expr.Binary(expr, right, operator);
+        }
+        return expr;
+    }
+
+    // assignment -> variable "=" assignment
+    //             | equality
+    private Expr assignment() {
+        Expr expr = equality();
+        if (match(TokenType.EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                // valid assignment target
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+            error(equals, "Invalid assignment target.");
         }
         return expr;
     }
@@ -127,7 +212,7 @@ public class Parser {
         return primary();
     }
 
-    // primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")
+    // primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ") | variable
     private Expr primary() {
         if (match(TokenType.FALSE)) return new Expr.Literal(false);
         if (match(TokenType.TRUE)) return new Expr.Literal(true);
@@ -141,7 +226,17 @@ public class Parser {
             return new Expr.Grouping(expr);
         }
 
+        if (match(TokenType.IDENTIFIER)) {
+            return variable();
+        }
+
         throw error(peek(), "Expect expression.");
+    }
+
+    // variable -> IDENTIFIER
+    // must call match() to assure it is a variable before this function in primary()
+    private Expr variable() {
+       return new Expr.Variable(previous());
     }
 
     private Token consume(TokenType type, String message) {

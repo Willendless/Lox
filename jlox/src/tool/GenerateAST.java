@@ -16,7 +16,16 @@ public class GenerateAST {
             "Binary: Expr left, Expr right, Token operator",
             "Grouping: Expr expression",
             "Unary: Expr expression, Token operator",
-            "Literal: Object value"
+            "Literal: Object value",
+            "Variable: Token name",
+            "Assign: Token name, Expr value"
+        ));
+
+        defineAST(outputdir, "Stmt", Arrays.asList(
+            "Expression: Expr expression",
+            "Print: Expr expression",
+            "Declare: Token name, Expr initializer",
+            "Block: List<Stmt> stmts"
         ));
     }
 
@@ -36,6 +45,8 @@ public class GenerateAST {
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
         writer.println("package jlox;");
+        writer.println();
+        writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class " + baseName + " {");
         writer.println();

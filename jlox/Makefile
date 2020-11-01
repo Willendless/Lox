@@ -20,6 +20,7 @@ run: $(TARGET)
 
 # usage: make generate_ast outputdir='./src/jlox'
 generate_ast:
+	javac -d build/ src/tool/GenerateAST.java
 	java -classpath build/ $(AST) $(outputdir)
 
 rm_generation:

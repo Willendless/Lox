@@ -1,9 +1,11 @@
 package jlox;
 
+import jlox.Expr.Assign;
 import jlox.Expr.Binary;
 import jlox.Expr.Grouping;
 import jlox.Expr.Literal;
 import jlox.Expr.Unary;
+import jlox.Expr.Variable;
 
 public class RPNPrinter implements Expr.Visitor<String> {
 
@@ -51,6 +53,18 @@ public class RPNPrinter implements Expr.Visitor<String> {
                 new Expr.Unary(new Expr.Literal(123), new Token(TokenType.MINUS, "-", null, 1)),
                 new Expr.Grouping(new Expr.Literal(45.67)), new Token(TokenType.STAR, "*", null, 1));
         System.out.println(new RPNPrinter().print(expression));
+    }
+
+    @Override
+    public String visitVariableExpr(Variable expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitAssignExpr(Assign expr) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
