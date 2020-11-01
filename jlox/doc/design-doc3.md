@@ -26,13 +26,19 @@
 
 ```
 expression -> comma;
-comma -> equality ("," equality)*;
+comma -> ternary ("," ternary)*;
+ternary -> equality "?" ternary ":" ternary
+        |  equality
 equality -> comparison ( ( "!=" | "==" ) comparison )*;
 comparison -> term ( ( ">" | ">=" | "<" "<=" ) term )*;
 term -> factor ( ( "-" | "+" ) factor )*;
 factor -> factor ( "/" | "*" ) unary | unary
-unary -> ( "!" | "-" ) unary | primary;
-primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")";
+unary -> ( "!" | "-" ) unary
+      | primary;
+primary -> NUMBER
+        | STRING
+        | "true" | "false" | "nil"
+        | "(" expression ")";
 ```
 
 ## recursive descent parsing
